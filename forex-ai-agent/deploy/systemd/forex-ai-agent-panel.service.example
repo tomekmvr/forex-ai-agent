@@ -1,0 +1,17 @@
+[Unit]
+Description=Forex AI Agent Admin Panel
+After=network.target
+
+[Service]
+Type=simple
+User=CHANGE_ME
+Group=CHANGE_ME
+WorkingDirectory=/home/CHANGE_ME/apps/forex-ai-agent
+Environment=ADMIN_PANEL_HOST=127.0.0.1
+Environment=ADMIN_PANEL_PORT=8501
+ExecStart=/home/CHANGE_ME/apps/forex-ai-agent/.venv/bin/python -m src.admin.run_http
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
