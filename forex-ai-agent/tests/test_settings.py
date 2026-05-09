@@ -30,6 +30,7 @@ def test_validate_credentials_accepts_complete_oanda_configuration(monkeypatch):
 def test_validate_mt5_credentials_accepts_relay_configuration(monkeypatch):
     monkeypatch.setenv("FOREX_AGENT_BROKER_PROFILE", "tms_oanda_mt5")
     monkeypatch.setenv("FOREX_AGENT_MT5_RELAY_URL", "http://127.0.0.1:8765")
+    monkeypatch.setenv("FOREX_AGENT_MT5_RELAY_TOKEN", "relay-secret")
     monkeypatch.delenv("FOREX_AGENT_MT5_LOGIN", raising=False)
     monkeypatch.delenv("FOREX_AGENT_MT5_PASSWORD", raising=False)
     monkeypatch.delenv("FOREX_AGENT_MT5_SERVER", raising=False)

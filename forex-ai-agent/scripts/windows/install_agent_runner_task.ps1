@@ -23,7 +23,12 @@ if (-not (Test-Path $logsDir)) {
     New-Item -ItemType Directory -Path $logsDir -Force | Out-Null
 }
 
-$runnerScript = "& '$pythonExe' -m src.runtime.agent_runner *> '$logsDir\agent_runner.log'"
+$runOncePrefix = ""
+if (-not $AtStartup) {
+    $runOncePrefix = "$env:FOREX_AGENT_RUNNER_RUN_ONCE='true'; "
+}
+
+$runnerScript = "$runOncePrefix& '$pythonExe' -m src.runtime.agent_runner *> '$logsDir\agent_runner.log'"
 
 if ($AtStartup) {
     schtasks /Create /SC ONSTART /TN $TaskName /TR "powershell.exe -ExecutionPolicy Bypass -Command $runnerScript" /RU $env:USERNAME /RL HIGHEST /F

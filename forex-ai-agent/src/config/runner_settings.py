@@ -32,6 +32,8 @@ class AgentRunnerSettings:
     failure_probability: float = 0.08
     decision_threshold: float = 0.15
     order_volume: float = 0.10
+    units_per_volume: float = 0.0
+    volume_step: float = 0.01
     poll_interval_seconds: int = 300
     close_opposite_positions: bool = True
     allow_same_side_reentry: bool = False
@@ -55,6 +57,8 @@ class AgentRunnerSettings:
             failure_probability=float(os.getenv(f"{prefix}_FAILURE_PROBABILITY", "0.08")),
             decision_threshold=float(os.getenv(f"{prefix}_DECISION_THRESHOLD", "0.15")),
             order_volume=float(os.getenv(f"{prefix}_ORDER_VOLUME", "0.10")),
+            units_per_volume=float(os.getenv(f"{prefix}_UNITS_PER_VOLUME", "0")),
+            volume_step=float(os.getenv(f"{prefix}_VOLUME_STEP", "0.01")),
             poll_interval_seconds=int(os.getenv(f"{prefix}_POLL_INTERVAL_SECONDS", "300")),
             close_opposite_positions=_as_bool(os.getenv(f"{prefix}_CLOSE_OPPOSITE_POSITIONS", "true"), True),
             allow_same_side_reentry=_as_bool(os.getenv(f"{prefix}_ALLOW_SAME_SIDE_REENTRY", "false")),
@@ -73,6 +77,8 @@ class AgentRunnerSettings:
             )
         if self.order_volume <= 0:
             raise ValueError("order_volume must be positive.")
+        if self.volume_step <= 0:
+            raise ValueError("volume_step must be positive.")
         if self.periods < 40:
             raise ValueError("periods must be at least 40.")
         if self.poll_interval_seconds <= 0:
@@ -84,6 +90,11 @@ class AgentRunnerSettings:
         if self.source_mode == "broker":
             execution_settings = ExecutionSettings.from_env()
             execution_settings.validate_credentials()
+
+            if self.units_per_volume <= 0:
+                raise ValueError(
+                    "Broker runner mode requires FOREX_AGENT_RUNNER_UNITS_PER_VOLUME to map risk units to broker volume."
+                )
 
             if execution_settings.is_mt5_profile and not execution_settings.has_mt5_relay:
                 if not execution_settings.mt5_terminal_path:

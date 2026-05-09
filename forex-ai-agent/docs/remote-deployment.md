@@ -85,9 +85,13 @@ FOREX_AGENT_RUNNER_INSTRUMENT=DE30.pro
 FOREX_AGENT_RUNNER_GRANULARITY=H1
 FOREX_AGENT_RUNNER_PERIODS=120
 FOREX_AGENT_RUNNER_ORDER_VOLUME=0.10
+FOREX_AGENT_RUNNER_UNITS_PER_VOLUME=1000
+FOREX_AGENT_RUNNER_VOLUME_STEP=0.01
 FOREX_AGENT_RUNNER_POLL_INTERVAL_SECONDS=300
 FOREX_AGENT_RUNNER_RUN_ONCE=false
 ```
+
+`FOREX_AGENT_RUNNER_ORDER_VOLUME` jest maksymalnym wolumenem. Finalny wolumen jest liczony z `risk_decision.position_units`, mapowany przez `FOREX_AGENT_RUNNER_UNITS_PER_VOLUME` i zaokraglany do kroku `FOREX_AGENT_RUNNER_VOLUME_STEP`.
 
 Jesli chcesz wykonywac prawdziwe zlecenia na koncie demo MT5, nie ustawiaj tutaj `paper`.
 W tym przypadku poprawny wariant to `broker + live`, bo aplikacja ma wysylac zlecenia do terminala MT5, ale terminal jest zalogowany do rachunku demo.
@@ -107,6 +111,8 @@ FOREX_AGENT_RUNNER_INSTRUMENT=DE30.pro
 FOREX_AGENT_RUNNER_GRANULARITY=H1
 FOREX_AGENT_RUNNER_PERIODS=120
 FOREX_AGENT_RUNNER_ORDER_VOLUME=0.01
+FOREX_AGENT_RUNNER_UNITS_PER_VOLUME=1000
+FOREX_AGENT_RUNNER_VOLUME_STEP=0.01
 FOREX_AGENT_RUNNER_POLL_INTERVAL_SECONDS=300
 FOREX_AGENT_RUNNER_RUN_ONCE=false
 ```
@@ -116,6 +122,8 @@ Do instalacji zadania Harmonogramu zadan uzyj:
 ```powershell
 .\scripts\windows\install_agent_runner_task.ps1 -IntervalMinutes 15
 ```
+
+Wariant interwalowy wymusza pojedynczy cykl na uruchomienie taska, zeby kolejne procesy runnera nie nakladaly sie.
 
 Wariant startowy przy uruchomieniu systemu:
 

@@ -4,6 +4,7 @@ import json
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
+from math import floor
 from typing import Callable, Optional
 
 import pandas as pd
@@ -76,6 +77,20 @@ def execute_trading_cycle(
             status_message=snapshot.status_message,
         )
 
+    order_volume = _resolve_order_volume(settings=settings, approved_units=risk.position_units)
+    if order_volume <= 0:
+        return AgentCycleResult(
+            timestamp=datetime.now(timezone.utc),
+            instrument=settings.instrument,
+            action="no_trade",
+            execution_mode=settings.execution_mode,
+            signal=decision.final_signal,
+            approved=False,
+            confidence=decision.confidence,
+            source_name=snapshot.source_name,
+            status_message="Resolved execution volume is zero after applying risk limits.",
+        )
+
     target_side = "buy" if decision.final_signal > 0 else "sell"
     target_position_side = "long" if target_side == "buy" else "short"
     same_side_positions = _filter_positions_by_side(instrument_positions, target_position_side)
@@ -115,7 +130,7 @@ def execute_trading_cycle(
         source_mode=settings.source_mode,
         instrument=settings.instrument,
         side=target_side,
-        volume=settings.order_volume,
+        volume=order_volume,
         execution_mode=settings.execution_mode,
         confirm_live_execution=settings.enable_live_execution,
         comment=f"{settings.comment_prefix} signal={decision.final_signal}",
@@ -151,6 +166,16 @@ def _filter_positions_by_side(frame: pd.DataFrame, side: str) -> pd.DataFrame:
         return pd.DataFrame(columns=frame.columns)
     normalized = frame["side"].astype(str).str.lower()
     return frame[normalized == side.lower()].copy()
+
+
+def _resolve_order_volume(*, settings: AgentRunnerSettings, approved_units: int) -> float:
+    if settings.source_mode == "demo":
+        return settings.order_volume
+
+    broker_volume = approved_units / settings.units_per_volume
+    stepped_volume = floor(broker_volume / settings.volume_step) * settings.volume_step
+    resolved = min(settings.order_volume, stepped_volume)
+    return round(max(0.0, resolved), 8)
 
 
 def main() -> None:

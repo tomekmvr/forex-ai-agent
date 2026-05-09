@@ -21,6 +21,17 @@ def test_build_mt5_admin_adapter_prefers_relay_when_url_present():
     assert isinstance(adapter, Mt5RelayBrokerAdapter)
 
 
+def test_validate_mt5_credentials_requires_relay_token(monkeypatch):
+    monkeypatch.setenv("FOREX_AGENT_BROKER_PROFILE", "tms_oanda_mt5")
+    monkeypatch.setenv("FOREX_AGENT_MT5_RELAY_URL", "http://127.0.0.1:8765")
+    monkeypatch.delenv("FOREX_AGENT_MT5_RELAY_TOKEN", raising=False)
+
+    settings = ExecutionSettings.from_env()
+
+    with pytest.raises(ValueError, match="relay token"):
+        settings.validate_mt5_credentials()
+
+
 def test_mt5_relay_adapter_loads_snapshot_and_sends_token():
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.headers["X-Relay-Token"] == "relay-secret"

@@ -11,7 +11,13 @@ from src.risk.manager import KillSwitchState, RiskDecision
 from src.runtime.agent_runner import execute_trading_cycle
 
 
-def _build_snapshot(*, signal: int, approved: bool, positions: pd.DataFrame | None = None) -> AdminPanelSnapshot:
+def _build_snapshot(
+    *,
+    signal: int,
+    approved: bool,
+    positions: pd.DataFrame | None = None,
+    position_units: int = 100,
+) -> AdminPanelSnapshot:
     index = pd.date_range("2026-01-01", periods=60, freq="h")
     return AdminPanelSnapshot(
         source_name="demo",
@@ -54,7 +60,7 @@ def _build_snapshot(*, signal: int, approved: bool, positions: pd.DataFrame | No
             kill_switch_triggered=False,
             requested_signal=signal,
             approved_signal=signal if approved else 0,
-            position_units=100,
+            position_units=position_units,
             capital_fraction=0.02,
             risk_budget=2000.0,
             expected_transaction_cost=2.0,
@@ -97,6 +103,49 @@ def test_execute_trading_cycle_submits_order_when_approved():
     assert len(calls) == 1
     assert calls[0]["side"] == "buy"
     assert calls[0]["volume"] == settings.order_volume
+
+
+def test_execute_trading_cycle_caps_broker_volume_with_risk_units(monkeypatch):
+    monkeypatch.setenv("FOREX_AGENT_BROKER_PROFILE", "tms_oanda_mt5")
+    monkeypatch.setenv("FOREX_AGENT_MT5_RELAY_URL", "http://127.0.0.1:8765")
+    monkeypatch.setenv("FOREX_AGENT_MT5_RELAY_TOKEN", "relay-secret")
+    monkeypatch.setenv("OPENAI_API_KEY", "secret")
+    monkeypatch.setenv("FOREX_AGENT_AI_DECISION_MODE", "supervisor")
+    settings = AgentRunnerSettings(
+        source_mode="broker",
+        execution_mode="live",
+        enable_live_execution=True,
+        instrument="DE30.pro",
+        order_volume=0.10,
+        units_per_volume=1000,
+        volume_step=0.01,
+    )
+    calls = []
+
+    def fake_submit_order_func(**kwargs):
+        calls.append(kwargs)
+        return TradeExecutionResult(
+            success=True,
+            broker="paper",
+            instrument=kwargs["instrument"],
+            side=kwargs["side"],
+            requested_volume=kwargs["volume"],
+            filled_volume=kwargs["volume"],
+            executed_price=0.0,
+            broker_order_id="paper-order",
+            status_code="PAPER",
+            message="ok",
+            request_payload=kwargs,
+        )
+
+    result = execute_trading_cycle(
+        settings,
+        snapshot_func=lambda **kwargs: _build_snapshot(signal=1, approved=True, position_units=35),
+        submit_order_func=fake_submit_order_func,
+    )
+
+    assert result.action == "submitted_order"
+    assert calls[0]["volume"] == 0.03
 
 
 def test_execute_trading_cycle_skips_when_same_side_position_exists():
@@ -186,10 +235,18 @@ def test_runner_validation_rejects_live_broker_mode_without_openai_supervisor(mo
     monkeypatch.setenv("FOREX_AGENT_MT5_PASSWORD", "secret")
     monkeypatch.setenv("FOREX_AGENT_MT5_SERVER", "OANDATMS-MT5")
     monkeypatch.setenv("FOREX_AGENT_MT5_TERMINAL_PATH", "C:/Program Files/TMS OANDA MetaTrader 5/terminal64.exe")
+    monkeypatch.setenv("FOREX_AGENT_RUNNER_UNITS_PER_VOLUME", "1000")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("FOREX_AGENT_OPENAI_API_KEY", raising=False)
 
-    settings = AgentRunnerSettings(source_mode="broker", execution_mode="live", enable_live_execution=True)
+    settings = AgentRunnerSettings(
+        **{
+            **AgentRunnerSettings.from_env().__dict__,
+            "source_mode": "broker",
+            "execution_mode": "live",
+            "enable_live_execution": True,
+        }
+    )
 
     try:
         settings.validate()
@@ -207,8 +264,16 @@ def test_runner_validation_rejects_mt5_live_mode_without_terminal_path(monkeypat
     monkeypatch.delenv("FOREX_AGENT_MT5_TERMINAL_PATH", raising=False)
     monkeypatch.setenv("OPENAI_API_KEY", "secret")
     monkeypatch.setenv("FOREX_AGENT_AI_DECISION_MODE", "supervisor")
+    monkeypatch.setenv("FOREX_AGENT_RUNNER_UNITS_PER_VOLUME", "1000")
 
-    settings = AgentRunnerSettings(source_mode="broker", execution_mode="live", enable_live_execution=True)
+    settings = AgentRunnerSettings(
+        **{
+            **AgentRunnerSettings.from_env().__dict__,
+            "source_mode": "broker",
+            "execution_mode": "live",
+            "enable_live_execution": True,
+        }
+    )
 
     try:
         settings.validate()
@@ -226,7 +291,23 @@ def test_runner_validation_accepts_live_broker_mode_with_mt5_and_openai(monkeypa
     monkeypatch.setenv("FOREX_AGENT_MT5_TERMINAL_PATH", "C:/Program Files/TMS OANDA MetaTrader 5/terminal64.exe")
     monkeypatch.setenv("OPENAI_API_KEY", "secret")
     monkeypatch.setenv("FOREX_AGENT_AI_DECISION_MODE", "supervisor")
+    monkeypatch.setenv("FOREX_AGENT_RUNNER_UNITS_PER_VOLUME", "1000")
 
-    settings = AgentRunnerSettings(source_mode="broker", execution_mode="live", enable_live_execution=True)
+    settings = AgentRunnerSettings.from_env()
 
     settings.validate()
+
+
+def test_runner_validation_rejects_broker_mode_without_units_per_volume(monkeypatch):
+    monkeypatch.setenv("FOREX_AGENT_BROKER_PROFILE", "tms_oanda_mt5")
+    monkeypatch.setenv("FOREX_AGENT_MT5_RELAY_URL", "http://127.0.0.1:8765")
+    monkeypatch.setenv("FOREX_AGENT_MT5_RELAY_TOKEN", "relay-secret")
+
+    settings = AgentRunnerSettings(source_mode="broker", execution_mode="paper", units_per_volume=0)
+
+    try:
+        settings.validate()
+    except ValueError as exc:
+        assert "UNITS_PER_VOLUME" in str(exc)
+    else:
+        raise AssertionError("Broker runner should reject missing units-per-volume mapping")

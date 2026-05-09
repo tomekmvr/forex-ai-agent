@@ -270,6 +270,7 @@ class Mt5BrokerAdapter(BrokerAdminAdapter):
             side = order.side.lower()
             order_type = module.ORDER_TYPE_BUY if side == "buy" else module.ORDER_TYPE_SELL
             price = float(tick_record.ask if side == "buy" else tick_record.bid)
+            filling_mode = self._resolve_order_filling(module, order.instrument)
 
             request = {
                 "action": module.TRADE_ACTION_DEAL,
@@ -281,7 +282,7 @@ class Mt5BrokerAdapter(BrokerAdminAdapter):
                 "magic": 20260508,
                 "comment": order.comment or "Forex AI Agent Admin",
                 "type_time": module.ORDER_TIME_GTC,
-                "type_filling": module.ORDER_FILLING_IOC,
+                "type_filling": filling_mode,
             }
             result = module.order_send(request)
             if result is None:
@@ -360,6 +361,7 @@ class Mt5BrokerAdapter(BrokerAdminAdapter):
             tick_record = self._coerce_record(tick)
             order_type = module.ORDER_TYPE_BUY if close_side == "buy" else module.ORDER_TYPE_SELL
             price = float(tick_record.ask if close_side == "buy" else tick_record.bid)
+            filling_mode = self._resolve_order_filling(module, order.instrument)
 
             request = {
                 "action": module.TRADE_ACTION_DEAL,
@@ -372,7 +374,7 @@ class Mt5BrokerAdapter(BrokerAdminAdapter):
                 "magic": 20260508,
                 "comment": order.comment,
                 "type_time": module.ORDER_TIME_GTC,
-                "type_filling": module.ORDER_FILLING_IOC,
+                "type_filling": filling_mode,
             }
             result = module.order_send(request)
             if result is None:
@@ -525,6 +527,22 @@ class Mt5BrokerAdapter(BrokerAdminAdapter):
         return frame[["instrument", "timestamp", "open", "high", "low", "close", "volume", "is_complete"]].set_index(
             "timestamp"
         )
+
+    def _resolve_order_filling(self, module: Any, instrument: str) -> int:
+        symbol_info_func = getattr(module, "symbol_info", None)
+        if callable(symbol_info_func):
+            symbol_info = symbol_info_func(instrument)
+            if symbol_info is not None:
+                filling_mode = getattr(self._coerce_record(symbol_info), "filling_mode", None)
+                if isinstance(filling_mode, int):
+                    return filling_mode
+
+        for attribute_name in ("ORDER_FILLING_RETURN", "ORDER_FILLING_IOC", "ORDER_FILLING_FOK"):
+            filling_value = getattr(module, attribute_name, None)
+            if isinstance(filling_value, int):
+                return filling_value
+
+        raise RuntimeError(f"MT5 filling mode could not be resolved for {instrument}.")
 
     @staticmethod
     def _coerce_record(record: Any) -> Any:

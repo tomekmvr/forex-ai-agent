@@ -51,6 +51,8 @@ FOREX_AGENT_RUNNER_INSTRUMENT=DE30.pro
 FOREX_AGENT_RUNNER_GRANULARITY=H1
 FOREX_AGENT_RUNNER_PERIODS=120
 FOREX_AGENT_RUNNER_ORDER_VOLUME=0.01
+FOREX_AGENT_RUNNER_UNITS_PER_VOLUME=1000
+FOREX_AGENT_RUNNER_VOLUME_STEP=0.01
 FOREX_AGENT_RUNNER_POLL_INTERVAL_SECONDS=300
 FOREX_AGENT_RUNNER_RUN_ONCE=false
 
@@ -64,6 +66,7 @@ Uwagi:
 - `live` jest tutaj poprawne, bo zlecenia ida do terminala MT5 zalogowanego na konto demo.
 - `paper` oznacza lokalna symulacje bez wysylki do MT5.
 - zacznij od `FOREX_AGENT_RUNNER_ORDER_VOLUME=0.01`.
+- ustaw `FOREX_AGENT_RUNNER_UNITS_PER_VOLUME` zgodnie z mapa jednostek ryzyka do 1.0 wolumenu u brokera.
 
 ## 4. Sprawdz terminal MT5
 
@@ -132,6 +135,8 @@ Cykl co 15 minut:
 ```powershell
 .\scripts\windows\install_agent_runner_task.ps1 -IntervalMinutes 15
 ```
+
+Wariant interwalowy wymusza pojedynczy cykl na jedno uruchomienie taska, zeby nie tworzyc wielu rownoleglych runnerow.
 
 Albo start przy uruchomieniu systemu:
 

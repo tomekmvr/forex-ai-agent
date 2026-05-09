@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from threading import Lock
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import parse_qs, urlparse
@@ -21,6 +22,7 @@ def serve_mt5_relay(settings: ExecutionSettings, host: str, port: int) -> None:
     relay_token = settings.mt5_relay_token
     if not relay_token:
         raise ValueError("FOREX_AGENT_MT5_RELAY_TOKEN is required before starting the MT5 relay.")
+    adapter_lock = Lock()
 
     class Mt5RelayRequestHandler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
@@ -34,7 +36,8 @@ def serve_mt5_relay(settings: ExecutionSettings, host: str, port: int) -> None:
                 instrument = params.get("instrument", ["DE30.pro"])[0]
                 granularity = params.get("granularity", ["H1"])[0]
                 count = int(params.get("count", ["120"])[0])
-                snapshot = adapter.load_snapshot(instrument=instrument, granularity=granularity, count=count)
+                with adapter_lock:
+                    snapshot = adapter.load_snapshot(instrument=instrument, granularity=granularity, count=count)
                 self._send_json(200, snapshot_to_payload(snapshot))
                 return
             self._send_json(404, {"error": f"Unknown endpoint: {parsed.path}"})
@@ -44,17 +47,19 @@ def serve_mt5_relay(settings: ExecutionSettings, host: str, port: int) -> None:
             self._require_token()
             payload = self._read_json_body()
             if parsed.path == "/orders/market":
-                result = adapter.submit_market_order(TradeOrderRequest(**payload))
+                with adapter_lock:
+                    result = adapter.submit_market_order(TradeOrderRequest(**payload))
                 self._send_json(200, trade_execution_result_to_payload(result))
                 return
             if parsed.path == "/positions/close":
-                result = adapter.close_position(
-                    instrument=str(payload["instrument"]),
-                    position_id=str(payload["position_id"]),
-                    volume=float(payload["volume"]),
-                    side=str(payload["side"]),
-                    comment=str(payload.get("comment", "")),
-                )
+                with adapter_lock:
+                    result = adapter.close_position(
+                        instrument=str(payload["instrument"]),
+                        position_id=str(payload["position_id"]),
+                        volume=float(payload["volume"]),
+                        side=str(payload["side"]),
+                        comment=str(payload.get("comment", "")),
+                    )
                 self._send_json(200, trade_execution_result_to_payload(result))
                 return
             self._send_json(404, {"error": f"Unknown endpoint: {parsed.path}"})

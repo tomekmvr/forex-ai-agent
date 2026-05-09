@@ -15,7 +15,9 @@ class FakeMt5Module:
     DEAL_TYPE_SELL = 1
     TRADE_ACTION_DEAL = 1
     ORDER_TIME_GTC = 0
+    ORDER_FILLING_FOK = 0
     ORDER_FILLING_IOC = 1
+    ORDER_FILLING_RETURN = 2
     TRADE_RETCODE_DONE = 10009
 
     def __init__(self) -> None:
@@ -77,6 +79,9 @@ class FakeMt5Module:
 
     def symbol_info_tick(self, symbol):
         return SimpleNamespace(bid=24535.1, ask=24537.0)
+
+    def symbol_info(self, symbol):
+        return SimpleNamespace(filling_mode=self.ORDER_FILLING_RETURN)
 
     def order_send(self, request):
         self.last_order_request = request
@@ -171,6 +176,7 @@ def test_mt5_adapter_submits_market_order():
     assert result.filled_volume == 0.10
     assert result.broker_order_id == "991122"
     assert fake_mt5.last_order_request["symbol"] == "DE30.pro"
+    assert fake_mt5.last_order_request["type_filling"] == fake_mt5.ORDER_FILLING_RETURN
 
 
 def test_mt5_adapter_closes_existing_position():

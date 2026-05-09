@@ -118,6 +118,10 @@ class ExecutionSettings:
 
     def validate_mt5_credentials(self) -> None:
         if self.has_mt5_relay:
+            if not self.mt5_relay_token:
+                raise ValueError(
+                    "Missing MT5 relay token. Set FOREX_AGENT_MT5_RELAY_TOKEN in the environment or .env file."
+                )
             return
         if self.mt5_login is None:
             raise ValueError("Missing MT5 login. Set FOREX_AGENT_MT5_LOGIN in the environment or .env file.")
