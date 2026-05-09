@@ -143,3 +143,61 @@ def test_supervisor_agent_returns_structured_signal_from_client():
     assert signal.agent_name == "supervisor_agent"
     assert signal.signal == 1
     assert signal.confidence == 0.61
+
+
+class FixedSignalAgent(BaseAgent):
+    def __init__(self, name: str, signal: int, confidence: float, weight: float = 1.0) -> None:
+        super().__init__(name=name, weight=weight)
+        self._signal = signal
+        self._confidence = confidence
+
+    def isolate_context(self, context: AgentContext) -> AgentContext:
+        return context
+
+    def evaluate(self, context: AgentContext) -> AgentSignal:
+        return AgentSignal(
+            agent_name=self.name,
+            signal=self._signal,
+            confidence=self._confidence,
+            reasoning=f"{self.name} fixed signal.",
+            diagnostics={},
+        )
+
+
+def test_orchestrator_blocks_trade_when_supervisor_disagrees():
+    orchestrator = Orchestrator(
+        agents=[
+            FixedSignalAgent("technical_agent", 1, 0.8),
+            FixedSignalAgent("sentiment_agent", 1, 0.7),
+            FixedSignalAgent("regime_agent", 1, 0.6),
+            FixedSignalAgent("supervisor_agent", -1, 0.9),
+        ],
+        decision_threshold=0.10,
+        require_supervisor_confirmation=True,
+    )
+
+    decision = orchestrator.decide(AgentContext())
+
+    assert decision.final_signal == 0
+    assert decision.approved is False
+    assert "Supervisor gate blocked trade due to directional disagreement." in decision.reasoning
+
+
+def test_orchestrator_confirms_trade_when_supervisor_aligns():
+    orchestrator = Orchestrator(
+        agents=[
+            FixedSignalAgent("technical_agent", 1, 0.8),
+            FixedSignalAgent("sentiment_agent", 1, 0.7),
+            FixedSignalAgent("regime_agent", 1, 0.6),
+            FixedSignalAgent("supervisor_agent", 1, 0.55),
+        ],
+        decision_threshold=0.10,
+        require_supervisor_confirmation=True,
+    )
+
+    decision = orchestrator.decide(AgentContext())
+
+    assert decision.final_signal == 1
+    assert decision.approved is True
+    assert decision.confidence == 0.55
+    assert "Supervisor gate confirmed final signal." in decision.reasoning

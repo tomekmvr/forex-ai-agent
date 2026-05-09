@@ -1,3 +1,4 @@
+from src.config.ai_settings import AISettings
 from src.config.settings import ExecutionSettings
 
 
@@ -37,3 +38,27 @@ def test_validate_mt5_credentials_accepts_relay_configuration(monkeypatch):
 
     settings.validate_mt5_credentials()
     assert settings.has_mt5_relay is True
+
+
+def test_ai_settings_default_to_supervisor_mode_when_openai_enabled(monkeypatch):
+    monkeypatch.setenv("FOREX_AGENT_AI_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "secret")
+    monkeypatch.delenv("FOREX_AGENT_AI_DECISION_MODE", raising=False)
+
+    settings = AISettings.from_env()
+
+    assert settings.enabled is True
+    assert settings.decision_mode == "supervisor"
+
+
+def test_ai_settings_reject_invalid_decision_mode(monkeypatch):
+    monkeypatch.setenv("FOREX_AGENT_AI_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "secret")
+    monkeypatch.setenv("FOREX_AGENT_AI_DECISION_MODE", "invalid")
+
+    try:
+        AISettings.from_env()
+    except ValueError as exc:
+        assert "AI_DECISION_MODE" in str(exc)
+    else:
+        raise AssertionError("AISettings.from_env should reject unsupported decision modes")

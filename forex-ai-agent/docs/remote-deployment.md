@@ -133,7 +133,12 @@ FOREX_AGENT_REQUEST_TIMEOUT_SECONDS=30
 FOREX_AGENT_VERIFY_SSL=true
 OPENAI_API_KEY=twoj_nowy_klucz_openai
 FOREX_AGENT_OPENAI_MODEL=gpt-4.1-mini
+FOREX_AGENT_AI_DECISION_MODE=supervisor
 ```
+
+Domyslnie tryb `supervisor` powoduje, ze OpenAI nie jest tylko dodatkowym agentem w sredniej wazonej.
+Przy aktywnym kluczu OpenAI supervisor musi potwierdzic kierunek transakcji, inaczej finalny sygnal zostaje wyzerowany.
+Jesli chcesz wrocic do starszego, mniej restrykcyjnego zachowania, ustaw `FOREX_AGENT_AI_DECISION_MODE=advisory`.
 
 Jesli chcesz tylko panel demo bez MT5, wystarczy pominac pola MT5 i uruchomic panel.
 

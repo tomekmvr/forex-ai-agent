@@ -348,7 +348,12 @@ def run_admin_snapshot(
         },
     )
 
-    orchestrator = Orchestrator(agents=build_agent_stack(), decision_threshold=decision_threshold)
+    ai_settings = AISettings.from_env()
+    orchestrator = Orchestrator(
+        agents=build_agent_stack(),
+        decision_threshold=decision_threshold,
+        require_supervisor_confirmation=ai_settings.enabled and ai_settings.decision_mode == "supervisor",
+    )
     orchestrator_decision = orchestrator.decide(context)
 
     resolved_equity, resolved_session_start_equity, resolved_current_equity = _resolve_risk_inputs(
