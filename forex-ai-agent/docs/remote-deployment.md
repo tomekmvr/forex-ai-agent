@@ -3,6 +3,7 @@
 Ten dokument opisuje zalecany sposob przeniesienia projektu na inny komputer w tej samej sieci lub za routerem z domena.
 
 Jesli chcesz przejsc najkrotsza sciezka uruchomienia MT5 demo na Windows, zobacz tez [docs/windows-mt5-demo-checklist.md](windows-mt5-demo-checklist.md).
+Po samej aktualizacji z GitHub uzyj tez [docs/windows-post-update-instructions.md](windows-post-update-instructions.md).
 
 ## Wariant Windows-Only
 
@@ -55,7 +56,8 @@ Ten skrypt:
 - pobiera zmiany z `origin/main`,
 - robi `git pull --ff-only`,
 - dogrywa zaleznosci z `requirements.txt`,
-- opcjonalnie restartuje panel.
+- opcjonalnie restartuje panel,
+- wypisuje, co sprawdzic dalej na hoście po aktualizacji.
 
 Jesli chcesz, zeby robilo sie to automatycznie, podepnij ten skrypt pod Harmonogram zadan Windows i ustaw trigger np. co 5 minut albo przy logowaniu.
 

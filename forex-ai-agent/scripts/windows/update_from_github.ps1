@@ -163,6 +163,9 @@ try {
     }
 
     Write-Log "Update finished successfully."
+    Write-Log "Next step: check docs/windows-post-update-instructions.md"
+    Write-Log "Quick MT5 check: .\.venv\Scripts\python.exe -m src.execution.check_mt5_connection"
+    Write-Log "Manual runner start: .\.venv\Scripts\python.exe -m src.runtime.agent_runner"
     exit 0
 }
 catch {
