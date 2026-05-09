@@ -63,6 +63,40 @@ Przyklad recznego odpalenia z innej galezi:
 .\scripts\windows\update_from_github.ps1 -Branch main -RestartPanel
 ```
 
+### Autonomiczny runner agenta na Windows
+
+Jesli serwer ma nie tylko hostowac panel, ale tez cyklicznie wykonywac decyzje tradingowe, uzyj:
+
+```powershell
+.\.venv\Scripts\python.exe -m src.runtime.agent_runner
+```
+
+Runner czyta ustawienia ze zmiennych `FOREX_AGENT_RUNNER_*` w `.env`, np.:
+
+```env
+FOREX_AGENT_RUNNER_SOURCE_MODE=broker
+FOREX_AGENT_RUNNER_EXECUTION_MODE=paper
+FOREX_AGENT_RUNNER_ENABLE_LIVE_EXECUTION=false
+FOREX_AGENT_RUNNER_INSTRUMENT=DE30.pro
+FOREX_AGENT_RUNNER_GRANULARITY=H1
+FOREX_AGENT_RUNNER_PERIODS=120
+FOREX_AGENT_RUNNER_ORDER_VOLUME=0.10
+FOREX_AGENT_RUNNER_POLL_INTERVAL_SECONDS=300
+FOREX_AGENT_RUNNER_RUN_ONCE=false
+```
+
+Do instalacji zadania Harmonogramu zadan uzyj:
+
+```powershell
+.\scripts\windows\install_agent_runner_task.ps1 -IntervalMinutes 15
+```
+
+Wariant startowy przy uruchomieniu systemu:
+
+```powershell
+.\scripts\windows\install_agent_runner_task.ps1 -AtStartup
+```
+
 ### Konfiguracja .env na Windows-only
 
 Jesli MT5 jest na tym samym hoście Windows:
