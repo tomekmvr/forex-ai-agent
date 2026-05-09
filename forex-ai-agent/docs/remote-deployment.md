@@ -2,6 +2,8 @@
 
 Ten dokument opisuje zalecany sposob przeniesienia projektu na inny komputer w tej samej sieci lub za routerem z domena.
 
+Jesli chcesz przejsc najkrotsza sciezka uruchomienia MT5 demo na Windows, zobacz tez [docs/windows-mt5-demo-checklist.md](windows-mt5-demo-checklist.md).
+
 ## Wariant Windows-Only
 
 Jesli docelowy komputer ma Windows i to na nim ma dzialac caly projekt, przyjmij ten uklad jako podstawowy:
