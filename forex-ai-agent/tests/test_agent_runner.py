@@ -178,3 +178,55 @@ def test_execute_trading_cycle_closes_opposite_position_before_submitting():
     assert len(close_calls) == 1
     assert len(submit_calls) == 1
     assert result.action == "submitted_order"
+
+
+def test_runner_validation_rejects_live_broker_mode_without_openai_supervisor(monkeypatch):
+    monkeypatch.setenv("FOREX_AGENT_BROKER_PROFILE", "tms_oanda_mt5")
+    monkeypatch.setenv("FOREX_AGENT_MT5_LOGIN", "123456")
+    monkeypatch.setenv("FOREX_AGENT_MT5_PASSWORD", "secret")
+    monkeypatch.setenv("FOREX_AGENT_MT5_SERVER", "OANDATMS-MT5")
+    monkeypatch.setenv("FOREX_AGENT_MT5_TERMINAL_PATH", "C:/Program Files/TMS OANDA MetaTrader 5/terminal64.exe")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("FOREX_AGENT_OPENAI_API_KEY", raising=False)
+
+    settings = AgentRunnerSettings(source_mode="broker", execution_mode="live", enable_live_execution=True)
+
+    try:
+        settings.validate()
+    except ValueError as exc:
+        assert "OpenAI supervisor configuration" in str(exc)
+    else:
+        raise AssertionError("Live broker runner should reject missing OpenAI supervisor configuration")
+
+
+def test_runner_validation_rejects_mt5_live_mode_without_terminal_path(monkeypatch):
+    monkeypatch.setenv("FOREX_AGENT_BROKER_PROFILE", "tms_oanda_mt5")
+    monkeypatch.setenv("FOREX_AGENT_MT5_LOGIN", "123456")
+    monkeypatch.setenv("FOREX_AGENT_MT5_PASSWORD", "secret")
+    monkeypatch.setenv("FOREX_AGENT_MT5_SERVER", "OANDATMS-MT5")
+    monkeypatch.delenv("FOREX_AGENT_MT5_TERMINAL_PATH", raising=False)
+    monkeypatch.setenv("OPENAI_API_KEY", "secret")
+    monkeypatch.setenv("FOREX_AGENT_AI_DECISION_MODE", "supervisor")
+
+    settings = AgentRunnerSettings(source_mode="broker", execution_mode="live", enable_live_execution=True)
+
+    try:
+        settings.validate()
+    except ValueError as exc:
+        assert "MT5_TERMINAL_PATH" in str(exc)
+    else:
+        raise AssertionError("Live MT5 runner should reject missing terminal path when no relay is configured")
+
+
+def test_runner_validation_accepts_live_broker_mode_with_mt5_and_openai(monkeypatch):
+    monkeypatch.setenv("FOREX_AGENT_BROKER_PROFILE", "tms_oanda_mt5")
+    monkeypatch.setenv("FOREX_AGENT_MT5_LOGIN", "123456")
+    monkeypatch.setenv("FOREX_AGENT_MT5_PASSWORD", "secret")
+    monkeypatch.setenv("FOREX_AGENT_MT5_SERVER", "OANDATMS-MT5")
+    monkeypatch.setenv("FOREX_AGENT_MT5_TERMINAL_PATH", "C:/Program Files/TMS OANDA MetaTrader 5/terminal64.exe")
+    monkeypatch.setenv("OPENAI_API_KEY", "secret")
+    monkeypatch.setenv("FOREX_AGENT_AI_DECISION_MODE", "supervisor")
+
+    settings = AgentRunnerSettings(source_mode="broker", execution_mode="live", enable_live_execution=True)
+
+    settings.validate()

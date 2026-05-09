@@ -3,6 +3,9 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
+from src.config.ai_settings import AISettings
+from src.config.settings import ExecutionSettings
+
 
 def _as_bool(value: str, default: bool = False) -> bool:
     if value is None:
@@ -74,3 +77,28 @@ class AgentRunnerSettings:
             raise ValueError("periods must be at least 40.")
         if self.poll_interval_seconds <= 0:
             raise ValueError("poll_interval_seconds must be positive.")
+
+        if self.execution_mode == "live" and self.source_mode == "demo":
+            raise ValueError("Live runner mode requires broker-backed source data, not demo mode.")
+
+        if self.source_mode == "broker":
+            execution_settings = ExecutionSettings.from_env()
+            execution_settings.validate_credentials()
+
+            if execution_settings.is_mt5_profile and not execution_settings.has_mt5_relay:
+                if not execution_settings.mt5_terminal_path:
+                    raise ValueError(
+                        "MT5 runner mode requires FOREX_AGENT_MT5_TERMINAL_PATH when no relay is configured."
+                    )
+
+        if self.execution_mode == "live":
+            ai_settings = AISettings.from_env()
+            if not ai_settings.enabled:
+                raise ValueError(
+                    "Live runner mode requires OpenAI supervisor configuration via OPENAI_API_KEY "
+                    "or FOREX_AGENT_OPENAI_API_KEY."
+                )
+            if ai_settings.decision_mode != "supervisor":
+                raise ValueError(
+                    "Live runner mode requires FOREX_AGENT_AI_DECISION_MODE=supervisor."
+                )

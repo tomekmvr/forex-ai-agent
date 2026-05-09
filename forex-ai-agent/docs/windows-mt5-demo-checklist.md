@@ -106,6 +106,9 @@ Na panelu potwierdz:
 
 Pierwszy reczny start jest obowiazkowy. Nie zaczynaj od Harmonogramu zadan.
 
+Runner jest teraz fail-fast. Jesli brakuje pelnej konfiguracji MT5 albo aktywnego supervisora OpenAI,
+proces powinien przerwac start od razu, zamiast przechodzic do czesciowego fallbacku.
+
 Sprawdz, czy:
 - runner nie konczy sie bledem,
 - logika pobiera snapshot brokerski,
