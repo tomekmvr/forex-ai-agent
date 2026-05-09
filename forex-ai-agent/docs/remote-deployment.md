@@ -85,6 +85,28 @@ FOREX_AGENT_RUNNER_POLL_INTERVAL_SECONDS=300
 FOREX_AGENT_RUNNER_RUN_ONCE=false
 ```
 
+Jesli chcesz wykonywac prawdziwe zlecenia na koncie demo MT5, nie ustawiaj tutaj `paper`.
+W tym przypadku poprawny wariant to `broker + live`, bo aplikacja ma wysylac zlecenia do terminala MT5, ale terminal jest zalogowany do rachunku demo.
+
+Przyklad bezpiecznego startu dla MT5 demo:
+
+```env
+FOREX_AGENT_BROKER_PROFILE=tms_oanda_mt5
+FOREX_AGENT_MT5_LOGIN=twoj_login_demo
+FOREX_AGENT_MT5_PASSWORD=twoje_haslo_demo
+FOREX_AGENT_MT5_SERVER=twoj_serwer_demo
+FOREX_AGENT_MT5_TERMINAL_PATH=C:/Program Files/TMS OANDA MetaTrader 5/terminal64.exe
+FOREX_AGENT_RUNNER_SOURCE_MODE=broker
+FOREX_AGENT_RUNNER_EXECUTION_MODE=live
+FOREX_AGENT_RUNNER_ENABLE_LIVE_EXECUTION=true
+FOREX_AGENT_RUNNER_INSTRUMENT=DE30.pro
+FOREX_AGENT_RUNNER_GRANULARITY=H1
+FOREX_AGENT_RUNNER_PERIODS=120
+FOREX_AGENT_RUNNER_ORDER_VOLUME=0.01
+FOREX_AGENT_RUNNER_POLL_INTERVAL_SECONDS=300
+FOREX_AGENT_RUNNER_RUN_ONCE=false
+```
+
 Do instalacji zadania Harmonogramu zadan uzyj:
 
 ```powershell
