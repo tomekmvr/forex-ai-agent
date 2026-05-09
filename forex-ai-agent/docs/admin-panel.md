@@ -139,6 +139,16 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\windows\setup_mt5.ps1
 ```
 
+## Dzienny update z GitHub na Windows
+
+Możesz zarejestrować dzienne zadanie Harmonogramu zadań, które pobierze zmiany z GitHub i po udanym update zrestartuje panel:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\register_daily_github_update.ps1 -Time 03:00 -RestartAdminPanel
+```
+
+Skrypt update używa `git pull --ff-only` i celowo pomija aktualizację, jeśli repo ma lokalne niezacommitowane zmiany.
+
 Wariant relay:
 
 ```powershell
