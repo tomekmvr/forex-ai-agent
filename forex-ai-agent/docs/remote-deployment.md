@@ -39,6 +39,30 @@ Ten skrypt:
 - wygeneruje `Caddyfile`,
 - poda gotowe polecenia do uruchomienia panelu i reverse proxy.
 
+### Automatyczna aktualizacja z GitHub na Windows
+
+Uzyj skryptu [scripts/windows/update_from_github.ps1](../scripts/windows/update_from_github.ps1):
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\windows\update_from_github.ps1 -RestartPanel
+```
+
+Ten skrypt:
+
+- pobiera zmiany z `origin/main`,
+- robi `git pull --ff-only`,
+- dogrywa zaleznosci z `requirements.txt`,
+- opcjonalnie restartuje panel.
+
+Jesli chcesz, zeby robilo sie to automatycznie, podepnij ten skrypt pod Harmonogram zadan Windows i ustaw trigger np. co 5 minut albo przy logowaniu.
+
+Przyklad recznego odpalenia z innej galezi:
+
+```powershell
+.\scripts\windows\update_from_github.ps1 -Branch main -RestartPanel
+```
+
 ### Konfiguracja .env na Windows-only
 
 Jesli MT5 jest na tym samym hoście Windows:
