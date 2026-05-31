@@ -31,6 +31,7 @@ Aplikacja na Androida ostrzegająca o fotoradarach stacjonarnych w Polsce, z obs
 - **Android**: 8.0 (API 26) lub nowszy
 - **Uprawnienia**:
   - `ACCESS_FINE_LOCATION` — dokładna lokalizacja GPS
+  - `ACCESS_BACKGROUND_LOCATION` — monitoring po zgaszeniu ekranu / w tle (Android 10+)
   - `FOREGROUND_SERVICE_LOCATION` — monitoring w tle
   - `POST_NOTIFICATIONS` — powiadomienie statusu (Android 13+)
 
@@ -42,6 +43,7 @@ Aplikacja na Androida ostrzegająca o fotoradarach stacjonarnych w Polsce, z obs
 2. Na telefonie: **Ustawienia → Bezpieczeństwo → Instaluj nieznane aplikacje** → zezwól przeglądarce/menedżerowi plików
 3. Otwórz pobrany plik APK i kliknij **Zainstaluj**
 4. Przyznaj uprawnienia do lokalizacji i powiadomień
+5. Na Androidzie 16 ustaw dla aplikacji lokalizację **„Zezwalaj zawsze”**, inaczej monitoring w tle nie uruchomi się poprawnie
 
 ---
 

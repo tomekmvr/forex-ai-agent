@@ -5,10 +5,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.pm.ServiceInfo
 import android.content.Intent
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.IBinder
 import pl.fotoradar.speedcamera.data.SpeedCameraPoint
 import pl.fotoradar.speedcamera.data.SpeedCameraRepository
@@ -66,7 +68,15 @@ class LocationMonitoringService : Service() {
         nearestCamera = null
         nearestDistance = Float.MAX_VALUE
 
-        startForeground(NOTIFICATION_ID, createNotification("Monitoring aktywny"))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                createNotification("Monitoring aktywny"),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, createNotification("Monitoring aktywny"))
+        }
 
         locationListener = LocationListener { location ->
             lastLocation = location

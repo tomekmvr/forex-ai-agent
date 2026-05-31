@@ -1,11 +1,13 @@
 package pl.fotoradar.speedcamera.ui
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.app.Activity
+import android.provider.Settings
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -22,9 +24,11 @@ class MainActivity : Activity() {
     private lateinit var tvNearestCamera: TextView
     private var testAlertEngine: AlertEngine? = null
 
-    private val PERM_REQUEST = 100
+    private val foregroundPermRequest = 100
+    private val backgroundPermRequest = 101
+    private var pendingBackgroundPermissionCheck = false
 
-    private val requiredPermissions = buildList {
+    private val requiredForegroundPermissions = buildList {
         add(Manifest.permission.ACCESS_FINE_LOCATION)
         add(Manifest.permission.ACCESS_COARSE_LOCATION)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -60,23 +64,62 @@ class MainActivity : Activity() {
     }
 
     private fun checkPermissionsAndStart() {
-        val missing = requiredPermissions.filter {
+        val missing = requiredForegroundPermissions.filter {
             checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
         }
-        if (missing.isEmpty()) {
-            startMonitoring()
-        } else {
-            requestPermissions(missing.toTypedArray(), PERM_REQUEST)
+        if (missing.isNotEmpty()) {
+            requestPermissions(missing.toTypedArray(), foregroundPermRequest)
+            return
         }
+
+        if (requiresBackgroundLocation() && !hasBackgroundLocationPermission()) {
+            requestBackgroundLocationPermission()
+            return
+        }
+
+        startMonitoring()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERM_REQUEST) {
-            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+        when (requestCode) {
+            foregroundPermRequest -> {
+                if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                    if (requiresBackgroundLocation() && !hasBackgroundLocationPermission()) {
+                        requestBackgroundLocationPermission()
+                    } else {
+                        startMonitoring()
+                    }
+                } else {
+                    Toast.makeText(this, "Uprawnienia do lokalizacji są wymagane", Toast.LENGTH_LONG).show()
+                }
+            }
+            backgroundPermRequest -> {
+                if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                    startMonitoring()
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Na Androidzie 16 włącz lokalizację „Zezwalaj zawsze”, aby monitoring działał w tle.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    updateUi()
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (pendingBackgroundPermissionCheck) {
+            pendingBackgroundPermissionCheck = false
+            if (!LocationMonitoringService.isRunning &&
+                hasAllForegroundPermissions() &&
+                hasBackgroundLocationPermission()
+            ) {
                 startMonitoring()
             } else {
-                Toast.makeText(this, "Uprawnienia do lokalizacji są wymagane", Toast.LENGTH_LONG).show()
+                updateUi()
             }
         }
     }
@@ -98,10 +141,45 @@ class MainActivity : Activity() {
         updateUi()
     }
 
+    private fun requestBackgroundLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            pendingBackgroundPermissionCheck = true
+            Toast.makeText(
+                this,
+                "Na Androidzie 16 ustaw lokalizację aplikacji na „Zezwalaj zawsze”, aby monitoring działał także przy zgaszonym ekranie.",
+                Toast.LENGTH_LONG
+            ).show()
+            startActivity(
+                Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", packageName, null)
+                )
+            )
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), backgroundPermRequest)
+        }
+    }
+
+    private fun hasAllForegroundPermissions(): Boolean =
+        requiredForegroundPermissions.all { checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
+
+    private fun requiresBackgroundLocation(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+    private fun hasBackgroundLocationPermission(): Boolean =
+        !requiresBackgroundLocation() ||
+            checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+
     private fun updateUi() {
         val isRunning = LocationMonitoringService.isRunning
         btnStartStop.text = if (isRunning) "■ Zatrzymaj monitoring" else "▶ Rozpocznij monitoring"
         tvStatus.text = if (isRunning) "🟢 Monitoring aktywny" else "🔴 Monitoring nieaktywny"
+
+        if (!isRunning && hasAllForegroundPermissions() && !hasBackgroundLocationPermission()) {
+            tvNearestCamera.visibility = View.VISIBLE
+            tvNearestCamera.text =
+                "⚠️ Android 16 wymaga lokalizacji „Zezwalaj zawsze”, żeby monitoring działał w tle."
+            return
+        }
 
         val nearest = LocationMonitoringService.nearestCamera
         val dist = LocationMonitoringService.nearestDistance
