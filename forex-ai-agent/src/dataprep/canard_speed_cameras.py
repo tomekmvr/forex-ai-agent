@@ -121,15 +121,14 @@ class CanardSpeedCameraSource:
             latitude, longitude = self._extract_lat_lon(row)
             if latitude is None or longitude is None:
                 continue
-            point_id = str(row.get("id") or row.get("name") or f"csv-{len(points)}")
-            road_name = row.get("road") or row.get("street")
             points.append(
-                SpeedCameraPoint(
-                    point_id=point_id,
+                self._build_point(
+                    node=row,
                     latitude=latitude,
                     longitude=longitude,
-                    road_name=road_name,
                     source=source,
+                    fallback_prefix="csv",
+                    fallback_index=len(points),
                 )
             )
         return self._deduplicate(points)
@@ -145,11 +144,13 @@ class CanardSpeedCameraSource:
                 latitude = float(match.group(1))
                 longitude = float(match.group(2))
                 points.append(
-                    SpeedCameraPoint(
-                        point_id=f"html-{index}",
+                    self._build_point(
+                        node={},
                         latitude=latitude,
                         longitude=longitude,
                         source=source,
+                        fallback_prefix="html",
+                        fallback_index=index,
                     )
                 )
         return self._deduplicate(points)
@@ -165,29 +166,27 @@ class CanardSpeedCameraSource:
                     longitude = self._as_float(coordinates[0])
                     latitude = self._as_float(coordinates[1])
                     if latitude is not None and longitude is not None:
-                        point_id = str(node.get("id") or node.get("name") or f"point-{len(points)}")
-                        road_name = node.get("road") or node.get("street")
                         points.append(
-                            SpeedCameraPoint(
-                                point_id=point_id,
+                            self._build_point(
+                                node=node,
                                 latitude=latitude,
                                 longitude=longitude,
-                                road_name=str(road_name) if road_name else None,
                                 source=source,
+                                fallback_prefix="point",
+                                fallback_index=len(points),
                             )
                         )
 
             latitude, longitude = self._extract_lat_lon(node)
             if latitude is not None and longitude is not None:
-                point_id = str(node.get("id") or node.get("name") or f"point-{len(points)}")
-                road_name = node.get("road") or node.get("street")
                 points.append(
-                    SpeedCameraPoint(
-                        point_id=point_id,
+                    self._build_point(
+                        node=node,
                         latitude=latitude,
                         longitude=longitude,
-                        road_name=str(road_name) if road_name else None,
                         source=source,
+                        fallback_prefix="point",
+                        fallback_index=len(points),
                     )
                 )
 
@@ -218,15 +217,39 @@ class CanardSpeedCameraSource:
             if latitude is None or longitude is None:
                 continue
             points.append(
-                SpeedCameraPoint(
-                    point_id=str(item.get("id") or f"fallback-{len(points)}"),
+                self._build_point(
+                    node=item,
                     latitude=latitude,
                     longitude=longitude,
-                    road_name=item.get("road_name"),
                     source="local_fallback",
+                    fallback_prefix="fallback",
+                    fallback_index=len(points),
                 )
             )
         return self._deduplicate(points)
+
+    def _build_point(
+        self,
+        *,
+        node: dict[str, Any],
+        latitude: float,
+        longitude: float,
+        source: str,
+        fallback_prefix: str,
+        fallback_index: int,
+    ) -> SpeedCameraPoint:
+        point_id = node.get("id") or node.get("name")
+        if not point_id:
+            point_id = f"{fallback_prefix}-{fallback_index}-{latitude:.6f}-{longitude:.6f}"
+
+        road_name = node.get("road") or node.get("street") or node.get("road_name")
+        return SpeedCameraPoint(
+            point_id=str(point_id),
+            latitude=latitude,
+            longitude=longitude,
+            road_name=str(road_name) if road_name else None,
+            source=source,
+        )
 
     @staticmethod
     def _deduplicate(points: list[SpeedCameraPoint]) -> list[SpeedCameraPoint]:

@@ -18,7 +18,7 @@ class _StubSession:
     def __init__(self, responses):
         self._responses = responses
 
-    def get(self, url, timeout, headers):
+    def get(self, url, **_kwargs):
         response = self._responses[url]
         if isinstance(response, Exception):
             raise response
