@@ -1,6 +1,7 @@
 package com.tomekmvr.forexaiagent
 
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import androidx.car.app.CarAppService
 import androidx.car.app.Session
 import androidx.car.app.Screen
@@ -15,7 +16,14 @@ import androidx.car.app.validation.HostValidator
 class SpeedCamCarAppService : CarAppService() {
     override fun onCreateSession(): Session = SpeedCamSession()
 
-    override fun createHostValidator(): HostValidator = HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
+    override fun createHostValidator(): HostValidator {
+        val isDebuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+        return if (isDebuggable) {
+            HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
+        } else {
+            HostValidator.Builder(this).build()
+        }
+    }
 }
 
 class SpeedCamSession : Session() {

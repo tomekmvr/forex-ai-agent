@@ -1,8 +1,12 @@
 package com.tomekmvr.forexaiagent
 
 class AlertEngine {
-    private val thresholds = listOf(1000, 500, 200)
-    private val triggeredThresholds = mutableMapOf<String, MutableSet<Int>>()
+    private val thresholds = listOf(200, 500, 1000)
+    private val triggeredThresholds = object : LinkedHashMap<String, MutableSet<Int>>(256, 0.75f, false) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, MutableSet<Int>>): Boolean {
+            return size > 500
+        }
+    }
 
     fun onNearest(point: WarningPoint, distanceMeters: Float): String? {
         val distanceInt = distanceMeters.toInt()

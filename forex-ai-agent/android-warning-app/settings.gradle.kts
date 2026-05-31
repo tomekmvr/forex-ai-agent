@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ForexAiAgentAndroid"
+rootProject.name = "SpeedCameraWarningApp"
 include(":app")

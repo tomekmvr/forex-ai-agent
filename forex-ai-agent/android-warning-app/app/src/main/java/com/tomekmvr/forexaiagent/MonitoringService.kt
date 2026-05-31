@@ -5,11 +5,13 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.pm.ServiceInfo
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.HandlerThread
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -24,6 +26,7 @@ class MonitoringService : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var warningPoints: List<WarningPoint>
     private lateinit var ttsAlertPlayer: TtsAlertPlayer
+    private lateinit var locationThread: HandlerThread
     private val alertEngine = AlertEngine()
     private var isMonitoring = false
 
@@ -58,6 +61,7 @@ class MonitoringService : Service() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         warningPoints = WarningPointRepository(this).load()
         ttsAlertPlayer = TtsAlertPlayer(this)
+        locationThread = HandlerThread("speed-camera-monitor").also { it.start() }
         createNotificationChannel()
     }
 
@@ -81,14 +85,22 @@ class MonitoringService : Service() {
             return
         }
 
-        startForeground(NOTIFICATION_ID, buildNotification())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                buildNotification(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, buildNotification())
+        }
         MonitoringStore.update(MonitoringStore.state.value.copy(monitoringActive = true))
 
-        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 4000L)
-            .setMinUpdateIntervalMillis(2000L)
+        val request = LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 6000L)
+            .setMinUpdateIntervalMillis(4000L)
             .build()
 
-        fusedLocationClient.requestLocationUpdates(request, locationCallback, mainLooper)
+        fusedLocationClient.requestLocationUpdates(request, locationCallback, locationThread.looper)
         isMonitoring = true
     }
 
@@ -142,7 +154,12 @@ class MonitoringService : Service() {
         if (isMonitoring) {
             fusedLocationClient.removeLocationUpdates(locationCallback)
         }
-        ttsAlertPlayer.release()
+        if (::locationThread.isInitialized) {
+            locationThread.quitSafely()
+        }
+        if (::ttsAlertPlayer.isInitialized) {
+            ttsAlertPlayer.release()
+        }
         super.onDestroy()
     }
 
