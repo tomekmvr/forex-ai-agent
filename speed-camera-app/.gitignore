@@ -1,8 +1,10 @@
 # Android build artifacts
 .gradle/
 build/
+.build-apk/
 *.ap_
 *-unsigned.apk
+*.idsig
 local.properties
 .idea/
 *.iml

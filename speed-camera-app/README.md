@@ -6,7 +6,7 @@ Aplikacja na Androida ostrzegająca o fotoradarach stacjonarnych w Polsce, z obs
 
 ### ⬇️ Najnowsza wersja
 
-**[FotoradaryPL-v1.0.0.apk](releases/FotoradaryPL-v1.0.0.apk)** — pobierz i zainstaluj bezpośrednio na telefonie.
+**[FotoradaryPL-v1.0.1.apk](releases/FotoradaryPL-v1.0.1.apk)** — poprawiony APK zgodny z nowszymi telefonami, w tym Xiaomi 15T.
 
 > Lub pobierz z zakładki [Releases](https://github.com/tomekmvr/forex-ai-agent/releases) po scaleniu PR.
 
@@ -98,7 +98,7 @@ speed-camera-app/
 │       ├── layout/activity_main.xml
 │       └── values/{strings,colors,themes}.xml
 └── releases/
-    └── FotoradaryPL-v1.0.0.apk        # Skompilowany APK
+    └── FotoradaryPL-v1.0.1.apk        # Skompilowany APK
 ```
 
 ---
@@ -106,9 +106,9 @@ speed-camera-app/
 ## Budowanie ze źródeł
 
 ```bash
-# Wymagania: Android SDK (build-tools 34), JDK 17, kotlinc
+# Wymagania: Android SDK, JDK 17, kotlinc
 cd speed-camera-app
-bash ../build_apk.sh
+bash build_apk.sh
 ```
 
 Lub przez GitHub Actions (automatyczne po tagu `v*`):
