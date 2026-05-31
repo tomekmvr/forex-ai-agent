@@ -1,0 +1,23 @@
+[
+  {
+    "id": "cam_warsaw_001",
+    "name": "Marszałkowska",
+    "latitude": 52.2297,
+    "longitude": 21.0122,
+    "speedLimit": 50
+  },
+  {
+    "id": "cam_warsaw_002",
+    "name": "Aleje Jerozolimskie",
+    "latitude": 52.2284,
+    "longitude": 21.0030,
+    "speedLimit": 70
+  },
+  {
+    "id": "cam_warsaw_003",
+    "name": "Puławska",
+    "latitude": 52.2094,
+    "longitude": 21.0175,
+    "speedLimit": 50
+  }
+]

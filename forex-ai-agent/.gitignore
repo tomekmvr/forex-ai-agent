@@ -2,3 +2,10 @@
 .pytest_cache/
 .env
 __pycache__/
+
+# Android project
+android-warning-app/.gradle/
+android-warning-app/local.properties
+android-warning-app/.idea/
+android-warning-app/build/
+android-warning-app/**/build/
