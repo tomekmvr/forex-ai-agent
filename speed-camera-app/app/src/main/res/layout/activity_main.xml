@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ostrzezenia o fotoradarach"
+            android:text="Ostrzeżenia o fotoradarach"
             android:textSize="14sp"
             android:textColor="#666666"
             android:layout_marginBottom="32dp" />
@@ -65,14 +65,14 @@
             android:id="@+id/btn_test_alert"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="Test alertu glosowego"
+            android:text="Test alertu głosowego"
             android:textSize="14sp"
             android:layout_marginBottom="32dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Jak dziala aplikacja:"
+            android:text="Jak działa aplikacja:"
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
@@ -80,7 +80,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="- Monitoruje lokalizacje GPS\n- Ostrzega glosowo: 1000m, 500m, 200m\n- Baza fotoradarow PL\n- Dziala w tle jako usluga"
+            android:text="- Monitoruje lokalizację GPS\n- Ostrzega głosowo: 1000m, 500m, 200m\n- Baza fotoradarów PL\n- Działa w tle jako usługa"
             android:textSize="14sp"
             android:lineSpacingExtra="4dp"
             android:layout_marginBottom="16dp" />
@@ -88,7 +88,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Uwaga: Zawsze przestrzegaj przepisow ruchu drogowego."
+            android:text="Uwaga: Zawsze przestrzegaj przepisów ruchu drogowego."
             android:textSize="12sp"
             android:textColor="#999999" />
 

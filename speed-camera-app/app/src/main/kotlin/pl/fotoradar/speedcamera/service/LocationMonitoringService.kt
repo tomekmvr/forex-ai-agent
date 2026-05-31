@@ -41,7 +41,7 @@ class LocationMonitoringService : Service() {
         repository = SpeedCameraRepository(this)
 
         alertEngine.onNearbyCamera = { camera, distance ->
-            if (distance < (nearestDistance ?: Float.MAX_VALUE)) {
+            if (distance < nearestDistance) {
                 nearestCamera = camera
                 nearestDistance = distance
                 onStatusUpdate?.invoke()
