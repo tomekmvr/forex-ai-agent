@@ -1,0 +1,14 @@
+[
+  {
+    "id": "fallback-demo-1",
+    "latitude": 52.2297,
+    "longitude": 21.0122,
+    "road_name": "Warszawa (demo)"
+  },
+  {
+    "id": "fallback-demo-2",
+    "latitude": 50.0647,
+    "longitude": 19.945,
+    "road_name": "Kraków (demo)"
+  }
+]
