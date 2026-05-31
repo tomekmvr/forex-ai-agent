@@ -1,0 +1,12 @@
+# Android build artifacts
+.gradle/
+build/
+*.ap_
+*-unsigned.apk
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# Keep compiled releases
+!releases/*.apk
