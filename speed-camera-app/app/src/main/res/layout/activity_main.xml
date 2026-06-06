@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fotoradary PL"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#1976D2"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ostrzeżenia o fotoradarach"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="32dp" />
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Monitoring nieaktywny"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:background="#F5F5F5"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/tv_nearest_camera"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="16sp"
+            android:gravity="center"
+            android:padding="12dp"
+            android:background="#FFF3E0"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btn_start_stop"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Rozpocznij monitoring"
+            android:textSize="16sp"
+            android:background="#1976D2"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btn_test_alert"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Test alertu głosowego"
+            android:textSize="14sp"
+            android:layout_marginBottom="32dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Jak działa aplikacja:"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="- Monitoruje lokalizację GPS\n- Ostrzega głosowo: 1000m, 500m, 200m\n- Baza fotoradarów PL\n- Działa w tle jako usługa"
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Uwaga: Zawsze przestrzegaj przepisów ruchu drogowego."
+            android:textSize="12sp"
+            android:textColor="#999999" />
+
+    </LinearLayout>
+</ScrollView>
