@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    NOTE: The `package` attribute is kept intentionally for compatibility with
+    build_apk.sh (direct aapt2 build without AGP). When building with Gradle,
+    the namespace defined in app/build.gradle.kts takes precedence.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pl.fotoradar.speedcamera">
 
