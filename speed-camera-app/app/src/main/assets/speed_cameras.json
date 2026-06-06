@@ -1,0 +1,137 @@
+[
+  {
+    "id": "cam_wwa_001",
+    "latitude": 52.2297,
+    "longitude": 21.0122,
+    "type": "speed_camera",
+    "speedLimit": 50,
+    "roadName": "ul. Marszałkowska, Warszawa",
+    "direction": null
+  },
+  {
+    "id": "cam_wwa_002",
+    "latitude": 52.2150,
+    "longitude": 21.0350,
+    "type": "speed_camera",
+    "speedLimit": 70,
+    "roadName": "Al. Jerozolimskie, Warszawa",
+    "direction": null
+  },
+  {
+    "id": "cam_wwa_003",
+    "latitude": 52.2500,
+    "longitude": 20.9800,
+    "type": "speed_camera",
+    "speedLimit": 50,
+    "roadName": "ul. Wolska, Warszawa",
+    "direction": null
+  },
+  {
+    "id": "cam_krk_001",
+    "latitude": 50.0614,
+    "longitude": 19.9366,
+    "type": "speed_camera",
+    "speedLimit": 50,
+    "roadName": "ul. Floriańska, Kraków",
+    "direction": null
+  },
+  {
+    "id": "cam_krk_002",
+    "latitude": 50.0700,
+    "longitude": 19.9200,
+    "type": "speed_camera",
+    "speedLimit": 70,
+    "roadName": "Al. Mickiewicza, Kraków",
+    "direction": null
+  },
+  {
+    "id": "cam_wro_001",
+    "latitude": 51.1079,
+    "longitude": 17.0385,
+    "type": "speed_camera",
+    "speedLimit": 50,
+    "roadName": "ul. Świdnicka, Wrocław",
+    "direction": null
+  },
+  {
+    "id": "cam_gdansk_001",
+    "latitude": 54.3520,
+    "longitude": 18.6466,
+    "type": "speed_camera",
+    "speedLimit": 50,
+    "roadName": "ul. Długa, Gdańsk",
+    "direction": null
+  },
+  {
+    "id": "cam_poznan_001",
+    "latitude": 52.4064,
+    "longitude": 16.9252,
+    "type": "speed_camera",
+    "speedLimit": 50,
+    "roadName": "ul. Półwiejska, Poznań",
+    "direction": null
+  },
+  {
+    "id": "cam_a1_001",
+    "latitude": 51.7523,
+    "longitude": 19.4531,
+    "type": "speed_camera",
+    "speedLimit": 140,
+    "roadName": "Autostrada A1, km 234",
+    "direction": "north"
+  },
+  {
+    "id": "cam_a2_001",
+    "latitude": 52.1900,
+    "longitude": 20.8000,
+    "type": "speed_camera",
+    "speedLimit": 140,
+    "roadName": "Autostrada A2, km 312",
+    "direction": "east"
+  },
+  {
+    "id": "cam_lodz_001",
+    "latitude": 51.7592,
+    "longitude": 19.4560,
+    "type": "speed_camera",
+    "speedLimit": 60,
+    "roadName": "ul. Piotrkowska, Łódź",
+    "direction": null
+  },
+  {
+    "id": "cam_katowice_001",
+    "latitude": 50.2649,
+    "longitude": 19.0238,
+    "type": "speed_camera",
+    "speedLimit": 50,
+    "roadName": "ul. Mariacka, Katowice",
+    "direction": null
+  },
+  {
+    "id": "cam_s8_001",
+    "latitude": 52.3100,
+    "longitude": 20.8500,
+    "type": "speed_camera",
+    "speedLimit": 120,
+    "roadName": "Droga S8, km 176",
+    "direction": null
+  },
+  {
+    "id": "cam_wwa_004",
+    "latitude": 52.1800,
+    "longitude": 21.0600,
+    "type": "speed_camera",
+    "speedLimit": 60,
+    "roadName": "ul. Puławska, Warszawa",
+    "direction": null
+  },
+  {
+    "id": "cam_wwa_005",
+    "latitude": 52.2400,
+    "longitude": 21.0450,
+    "type": "speed_camera",
+    "speedLimit": 50,
+    "roadName": "ul. Targowa, Warszawa",
+    "direction": null
+  }
+]

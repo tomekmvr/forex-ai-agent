@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fotoradary PL</string>
+    <string name="start_monitoring">▶ Rozpocznij monitoring</string>
+    <string name="stop_monitoring">■ Zatrzymaj monitoring</string>
+    <string name="status_active">🟢 Monitoring aktywny</string>
+    <string name="status_inactive">🔴 Monitoring nieaktywny</string>
+    <string name="nearest_camera_info">⚠️ Fotoradar za %1$d m · %2$d km/h · %3$s</string>
+    <string name="no_cameras_nearby">✅ Brak fotoradarów w pobliżu (zasięg 2 km)</string>
+    <string name="btn_test_alert">🔊 Test alertu głosowego</string>
+    <string name="description_android_auto">Aplikacja obsługuje Android Auto. Podłącz telefon do samochodu, aby wyświetlić ostrzeżenia na ekranie.</string>
+</resources>
